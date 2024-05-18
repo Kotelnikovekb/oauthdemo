@@ -71,25 +71,25 @@ class MyYandexLoginSDKObserver: NSObject, YandexLoginSDKObserver {
             
             
             
-            let book = SussesResponse(susses: true, token: res.token, expiresIn: -1)
+            let response = SussesResponse(susses: true, token: res.token, expiresIn: -1)
             
             
             let encoder = JSONEncoder()
             
-            let bookJson = try encoder.encode(book)
-            let bookJsonString = String(data: bookJson, encoding: .utf8)
+            let responseJson = try encoder.encode(response)
+            let responseJsonString = String(data: responseJson, encoding: .utf8)
             
-            self.resultFlutter(bookJsonString)
+            self.resultFlutter(responseJsonString)
             
         }catch{
-            let book = ErrorResponse(susses: false, errorMessage: "\(error)")
+            let response = ErrorResponse(susses: false, errorMessage: "\(error)")
             let encoder = JSONEncoder()
             
             do {
-                let bookJson = try encoder.encode(book)
-                let bookJsonString = String(data: bookJson, encoding: .utf8)
+                let responseJson = try encoder.encode(response)
+                let responseJsonString = String(data: responseJson, encoding: .utf8)
                 
-                self.resultFlutter(FlutterError.init(code: "errorSetDebug",message: bookJsonString,details:nil))
+                self.resultFlutter(FlutterError.init(code: "errorSetDebug",message: responseJsonString,details:nil))
             }catch{
                 
             }

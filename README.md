@@ -5,7 +5,7 @@
 - [Документация яндекса для работы с мобильными приложениями](https://yandex.ru/dev/id/doc/ru/mobileauthsdk/about)
 - [Документация Flutter для работы с нативом](https://docs.flutter.dev/platform-integration/platform-channels)
 
-## Работа с нативом на стороне Flutter
+## Работа с нативом на стороне Flutter№№#
 
 Для общения с нативом вам требуется создать канал `MethodChannel`. И все! вы можете вызывать созданные вами методы и передавать аргументы на нативную платформу при помощи `invokeMethod`
 ### Пример:
