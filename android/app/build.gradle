@@ -50,7 +50,7 @@ android {
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         //Добавим клюя авторизации для работы либы
-        manifestPlaceholders += [YANDEX_CLIENT_ID:"c9f25df278d24c55844f5fb2328c8384"]
+        manifestPlaceholders += [YANDEX_CLIENT_ID:"Ключ приложения"]
     }
 
     buildTypes {

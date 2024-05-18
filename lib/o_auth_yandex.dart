@@ -16,7 +16,7 @@ class OAuthYandex{
   // Создаем наш канал. Для удобства сделаем его приватным для класса
   final _methodChannel = const MethodChannel('kotelnikoff_dev');
 
-  // Инициализация библиотеки
+  // Инициализация библиотеки. Проверяем доступна ли она
   Future<bool> setUp()async{
 
     try{

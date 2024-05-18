@@ -28,8 +28,10 @@ import YandexLoginSDK
                           YandexLoginSDK.shared.add(observer: self.myYandex)
                           result(true)
                       } catch {
-                          result("error activating YandexLoginSDK: \(error)")
-                          
+                          result(FlutterError(code: "InitError",
+                                                                                message: "Error YandexLoginSDK \(error)",
+                                                                                details: "\(error)"))
+
                           
                       }
                       
