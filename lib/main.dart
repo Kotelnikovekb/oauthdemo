@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:oauthdemo/yandex_response_model.dart';
 
 void main() {
   runApp(const MyApp());
@@ -41,6 +42,7 @@ class _MyHomePageState extends State<MyHomePage> {
     setUp();
   }
   Future<String> setUp()async{
+
     try{
       // этот метод нужен для инициализации библиотеки авторизации яндекса
       final message=await platform.invokeMethod('start');
@@ -50,11 +52,13 @@ class _MyHomePageState extends State<MyHomePage> {
       return 'error';
     }
   }
-  void login()async{
+  Future login()async{
     try{
       // Тут запускаем авторизацию. И все готово
       final message=await platform.invokeMethod('yandexAuth');
-      print("===>>>>>>>>>>>>${message}");
+      //парсим ответ
+      final res=yandexResponseModelFromJson(message);
+      print(res.token);
     }catch(e,s){
       print(e);
     }
