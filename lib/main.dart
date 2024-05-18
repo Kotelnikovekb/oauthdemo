@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:oauthdemo/yandex_response_model.dart';
+import 'package:oauthdemo/o_auth_yandex.dart';
 
 void main() {
   runApp(const MyApp());
@@ -8,8 +7,6 @@ void main() {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -33,36 +30,41 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
-  // Создаем канал для обмена сообщений с платформой
-  static const platform=MethodChannel('kotelnikoff_dev');
+  //Добавляем наш класс
+  final oAuth=OAuthYandex();
+  //Переменная отвечает за доступность авторизации
+  bool available=false;
   @override
   void initState() {
     super.initState();
-    setUp();
+    oAuth.setUp().then(
+            (value) {
+              print('Яндекс доступен');
+            setState(() {
+              available=true;
+            });
+            }
+    ).catchError((e,s){
+      print('Яндекс не доступен ${e} ${s}');
+    });
+    oAuth.getCertificateFingerprint().then((value) => print(value));
+    oAuth.getCertificateFingerprint(type: FingerprintType.SHA256).then((value) => print(value));
   }
-  Future<String> setUp()async{
-
+  void login()async{
+    if(!available){
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Бибилиотека не доступна!'),
+      ));
+      return;
+    }
     try{
-      // этот метод нужен для инициализации библиотеки авторизации яндекса
-      final message=await platform.invokeMethod('start');
-      return message;
-
+      final res=await oAuth.login();
+      print(res);
     }catch(e,s){
-      return 'error';
+      print('Ошибка ${e}\n${s}');
     }
   }
-  Future login()async{
-    try{
-      // Тут запускаем авторизацию. И все готово
-      final message=await platform.invokeMethod('yandexAuth');
-      //парсим ответ
-      final res=yandexResponseModelFromJson(message);
-      print(res.token);
-    }catch(e,s){
-      print(e);
-    }
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -75,7 +77,7 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Center(
         child: ElevatedButton(
           child: const Text('Войти через яндекс'),
-          onPressed:login,
+          onPressed: login,
         ),
       ),
     );

@@ -1,5 +1,6 @@
 # Uncomment this line to define a global platform for your project
 platform :ios, '14.0'
+# Добавляем библиотеку авторизации яндекса
 pod 'YandexLoginSDK'
 
 # CocoaPods analytics sends network stats synchronously affecting flutter build latency.

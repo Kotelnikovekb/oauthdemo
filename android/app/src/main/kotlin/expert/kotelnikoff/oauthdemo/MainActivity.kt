@@ -26,6 +26,7 @@ class MainActivity: FlutterActivity(), MethodChannel.MethodCallHandler {
     private lateinit var channel : MethodChannel
     private lateinit var context: Context;
 
+
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         if(call.method=="start"){
             try {
@@ -35,11 +36,13 @@ class MainActivity: FlutterActivity(), MethodChannel.MethodCallHandler {
                 result.error("InitError","${e.message}","${e.stackTrace}")
             }
         }else if(call.method=="yandexAuth"){
+            // создаем интент для запуска активити яндекса и авторизации в ней. Сохраняем result для последующего использования.
             if(this.result!=null){
                 result.error("InitError","Прошлый запрос еще не выполнен, ждите","Подожди")
                 return;
             }
             this.result=result
+            // из документации яндекса
             try{
                 val loginOptions = YandexAuthLoginOptions()
                 val intent: Intent = yandexSdk.contract.createIntent(applicationContext,loginOptions)
@@ -48,14 +51,15 @@ class MainActivity: FlutterActivity(), MethodChannel.MethodCallHandler {
                 result.error("InitError","${e.message}","${e.stackTrace}")
             }
         }
-        else if(call.method=="getCertificateSHA1Fingerprint"){
+        // этот метод нужнен для получения отпечатка. можно использовать консольную команду, но у меня она не всегда работает.
+        else if(call.method=="getCertificateFingerprint"){
             try {
                 val info = context.packageManager.getPackageInfo(
                     context.packageName,
                     PackageManager.GET_SIGNATURES
                 )
                 for (signature in info.signatures) {
-                    val md: MessageDigest = MessageDigest.getInstance("SHA256")
+                    val md: MessageDigest = MessageDigest.getInstance(call.arguments.toString())
                     md.update(signature.toByteArray())
                     val digest = md.digest()
                     val hexString = digest.joinToString(":") { "%02x".format(it) }
@@ -73,13 +77,14 @@ class MainActivity: FlutterActivity(), MethodChannel.MethodCallHandler {
         }
 
     }
-
+    // При создании нативной активити добавляем слушатель событий Flutter
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         context = applicationContext
         channel = MethodChannel(flutterEngine!!.dartExecutor.binaryMessenger, CHANEL_NAME)
         channel.setMethodCallHandler(this)
     }
+    // метод из документации яндекса. смотрим на сколько успешным был запрос
     private fun handleResult(result: YandexAuthResult) {
         when (result) {
             is YandexAuthResult.Success -> onSuccessAuth(result.token)
@@ -88,8 +93,6 @@ class MainActivity: FlutterActivity(), MethodChannel.MethodCallHandler {
         }
     }
     private fun onSuccessAuth(token: YandexAuthToken){
-        Log.d("YandexOAuth", "Успешный ответ ${token.value}")
-
         val res=mapOf(
             "susses" to true,
             "token" to token.value,
@@ -99,12 +102,10 @@ class MainActivity: FlutterActivity(), MethodChannel.MethodCallHandler {
         if(result!==null){
             result!!.success(JSONObject(res.toMap()).toString())
             result=null
-        }else{
-            Log.d("YandexOAuth", "result is null")
-
         }
 
     }
+    /// слушаем результат выполнения запроса на авторизацию
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode==REQUEST_LOGIN_YANDEX){
             val sdk = YandexAuthSdk.create(YandexAuthOptions(applicationContext))

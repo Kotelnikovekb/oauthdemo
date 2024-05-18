@@ -17,7 +17,7 @@ import YandexLoginSDK
               }
       //Подключаемся к нашему каналу
       let channel = FlutterMethodChannel(name: "kotelnikoff_dev", binaryMessenger: controller.binaryMessenger)
-
+      // добавляем слушаем
       channel.setMethodCallHandler { (call: FlutterMethodCall, result: @escaping FlutterResult) in
                   if call.method == "start" {
                     
@@ -28,7 +28,6 @@ import YandexLoginSDK
                           YandexLoginSDK.shared.add(observer: self.myYandex)
                           result(true)
                       } catch {
-                          print("error activating YandexLoginSDK: \(error)")
                           result("error activating YandexLoginSDK: \(error)")
                           
                           
@@ -39,10 +38,7 @@ import YandexLoginSDK
                           do{
                               self.myYandex.setResult(result: result);
                               try YandexLoginSDK.shared.authorize(with: viewController)
-                              print ("YandexLoginSDK login susses")
                           }catch{
-                              print("Ошибка YandexLoginSDK: \(error)")
-
                               result(FlutterError(code: "ERROR YandexLoginSDK",
                                                       message: "Error YandexLoginSDK \(error)",
                                                       details: "\(error)"))
@@ -73,7 +69,7 @@ class MyYandexLoginSDKObserver: NSObject, YandexLoginSDKObserver {
             
             
             
-            let book = SussesResponse(susses: true, provider: "yandex", token: res.token, expiresIn: -1)
+            let book = SussesResponse(susses: true, token: res.token, expiresIn: -1)
             
             
             let encoder = JSONEncoder()
@@ -84,7 +80,7 @@ class MyYandexLoginSDKObserver: NSObject, YandexLoginSDKObserver {
             self.resultFlutter(bookJsonString)
             
         }catch{
-            let book = ErrorResponse(susses: false, provider: "yandex", errorMessage: "\(error)")
+            let book = ErrorResponse(susses: false, errorMessage: "\(error)")
             let encoder = JSONEncoder()
             
             do {
@@ -104,13 +100,11 @@ class MyYandexLoginSDKObserver: NSObject, YandexLoginSDKObserver {
 //Это нужно для типизации успешного результата с токеном. Я не нашел как это реализовать иначе. Если есть идеи, то напишите в комменты
 struct SussesResponse: Encodable {
     var susses: Bool
-    var provider: String
     var token: String
     var expiresIn: Int
 }
 
 struct ErrorResponse: Encodable {
     var susses: Bool
-    var provider: String
     var errorMessage: String
 }
